@@ -16,23 +16,33 @@ public class Hash {
 	
 	private static BigInteger hashint; 
 	
-	public static BigInteger hashOf(String entity) {		
+	public static BigInteger hashOf(String entity) {
 		
 		// Task: Hash a given string using MD5 and return the result as a BigInteger.
-		
+
 		// we use MD5 with 128 bits digest
-		
+
 		// compute the hash of the input 'entity'
-		
+
 		// convert the hash into hex format
-		
+
 		// convert the hex into BigInteger
-		
+
 		// return the BigInteger
 
-		int hash = entity.hashCode();
-		String hex = Integer.toHexString(hash);
-		hashint = BigInteger.valueOf(Integer.parseInt(hex));
+//		int hash = entity.hashCode();
+//		String hex = Integer.toHexString(hash);
+//		hashint = BigInteger.valueOf(Integer.parseInt(hex));
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] bytes = md.digest(entity.getBytes());
+			hashint = new BigInteger(1, bytes);
+			String hexString = hashint.toString(16);
+			hashint = new BigInteger(hexString, 16);
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 
 		return hashint;
 	}
@@ -48,7 +58,8 @@ public class Hash {
 		// compute the address size = 2 ^ number of bits
 		
 		// return the address size
-		
+
+
 		return null;
 	}
 	
