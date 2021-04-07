@@ -29,7 +29,11 @@ public class Hash {
 		// convert the hex into BigInteger
 		
 		// return the BigInteger
-		
+
+		int hash = entity.hashCode();
+		String hex = Integer.toHexString(hash);
+		hashint = BigInteger.valueOf(Integer.parseInt(hex));
+
 		return hashint;
 	}
 	
