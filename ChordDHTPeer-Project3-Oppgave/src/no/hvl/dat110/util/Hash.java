@@ -30,9 +30,6 @@ public class Hash {
 
 		// return the BigInteger
 
-//		int hash = entity.hashCode();
-//		String hex = Integer.toHexString(hash);
-//		hashint = BigInteger.valueOf(Integer.parseInt(hex));
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			byte[] bytes = md.digest(entity.getBytes());
