@@ -54,7 +54,7 @@ public class Hash {
 		
 		// compute the address size = 2 ^ number of bits
 		
-		// return the address size
+		// return the address size.
 
 		int adSize = bitSize();
 
