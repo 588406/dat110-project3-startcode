@@ -56,8 +56,7 @@ public class Hash {
 		
 		// return the address size
 
-		int adSize = hashint.toString().length();
-		adSize = adSize*8;
+		int adSize = bitSize();
 
 		return BigInteger.valueOf(2^adSize);
 
@@ -66,7 +65,7 @@ public class Hash {
 	
 	public static int bitSize() {
 		
-		int digestlen = 0;
+		int digestlen = hashint.toString().length() ;
 		
 		// find the digest length
 		
