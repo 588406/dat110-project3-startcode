@@ -56,8 +56,12 @@ public class Hash {
 		
 		// return the address size
 
+		int adSize = hashint.toString().length();
+		adSize = adSize*8;
 
-		return null;
+		return BigInteger.valueOf(2^adSize);
+
+
 	}
 	
 	public static int bitSize() {
