@@ -43,8 +43,17 @@ public class Util {
 		
 		// implement: read the descriptions above
 		boolean cond = false;
+		BigInteger node = upper;
 
-		
+		if(lower.compareTo(upper) > 0){
+			node = upper.add(Hash.addressSize());
+			if(id.compareTo(upper) <= 0){
+				id = id.add(Hash.addressSize());
+			}
+		}
+		upper = node;
+		cond = lower.compareTo(id) <= 0 && id.compareTo(upper) <= 0;
+
 		return cond;
 	}
 	
