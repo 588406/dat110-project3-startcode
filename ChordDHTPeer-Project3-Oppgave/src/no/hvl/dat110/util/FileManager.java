@@ -96,19 +96,17 @@ public class FileManager {
 
 		createReplicaFiles();
 		Random rd = new Random();
-		int index = rd.nextInt(Util.numReplicas-1);
+		int rndInt = rd.nextInt(Util.numReplicas-1);
 
 		for(BigInteger replica: replicafiles){
 			NodeInterface successor = chordnode.findSuccessor(replica);
 			successor.addKey(replica);
 
-			successor.saveFileContent(filename, replica, bytesOfFile, counter == index);
+			successor.saveFileContent(filename, replica, bytesOfFile, counter == rndInt);
 
 			counter++;
 		}
 
-
-    		
 		return counter;
     }
 	
@@ -151,7 +149,7 @@ public class FileManager {
 	 * Find the primary server - Remote-Write Protocol
 	 * @return 
 	 */
-	public NodeInterface findPrimaryOfItem() {
+	public NodeInterface findPrimaryOfItem() throws RemoteException {
 
 		// Task: Given all the active peers of a file (activeNodesforFile()), find which is holding the primary copy
 		
@@ -162,6 +160,12 @@ public class FileManager {
 		// use the primaryServer boolean variable contained in the Message class to check if it is the primary or not
 		
 		// return the primary
+
+		for (Message mg : activeNodesforFile){
+			if(mg.isPrimaryServer()){
+				return chordnode.findSuccessor(mg.getNodeID());
+			}
+		}
 		
 		return null; 
 	}
