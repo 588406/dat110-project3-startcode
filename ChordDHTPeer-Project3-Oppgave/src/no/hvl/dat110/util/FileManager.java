@@ -141,6 +141,7 @@ public class FileManager {
 			NodeInterface node = chordnode.findSuccessor(replica);
 			succinfo.add(node.getFilesMetadata(replica));
 		}
+
 		this.activeNodesforFile = succinfo;
 		
 		return succinfo;
