@@ -90,7 +90,7 @@ public class MutualExclusion {
 		// iterate over the activenodes
 		for( Message msg : activenodes){
 			// obtain a stub for each node from the registry
-			NodeInterface stub = Util.getProcessStub(message.getNodeIP(), msg.getPort());
+			NodeInterface stub = Util.getProcessStub(msg.getNodeIP(), msg.getPort());
 			// call onMutexRequestReceived()
 			stub.onMutexRequestReceived(message);
 		}
