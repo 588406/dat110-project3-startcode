@@ -157,12 +157,13 @@ public class MutualExclusion {
 			 *  the message with lower timestamp wins) - send OK if received is lower. Queue message if received is higher
 			 */
 			case 2: {
+				NodeInterface stub = Util.getProcessStub(procName, port);
+
 				// check the clock of the sending process
 				int clockSender = message.getClock();
 				// own clock for the multicast message
 				int ownClock = node.getMessage().getClock();
 				// compare clocks, the lowest wins
-				NodeInterface stub = Util.getProcessStub(procName, port);
 
 				if(clockSender == ownClock){
 				// if clocks are the same, compare nodeIDs, the lowest wins
