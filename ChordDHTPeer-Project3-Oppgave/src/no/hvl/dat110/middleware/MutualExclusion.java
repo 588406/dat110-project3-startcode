@@ -101,16 +101,25 @@ public class MutualExclusion {
 	public void onMutexRequestReceived(Message message) throws RemoteException {
 		
 		// increment the local clock
-		
+		clock.increment();
 		// if message is from self, acknowledge, and call onMutexAcknowledgementReceived()
-			
+			if(message.getNodeIP().equals(node.getNodeName())){
+				message.setAcknowledged(true);
+				node.onMutexAcknowledgementReceived(message);
+			}
 		int caseid = -1;
 		
 		// write if statement to transition to the correct caseid
 		// caseid=0: Receiver is not accessing shared resource and does not want to (send OK to sender)
 		// caseid=1: Receiver already has access to the resource (dont reply but queue the request)
 		// caseid=2: Receiver wants to access resource but is yet to - compare own message clock to received message's clock
-		
+		if(!CS_BUSY && !WANTS_TO_ENTER_CS) {
+			caseid = 0;
+		}else if(CS_BUSY){
+			caseid = 1;
+		}else if(WANTS_TO_ENTER_CS){
+			caseid = 2;
+		}
 		// check for decision
 		doDecisionAlgorithm(message, mutexqueue, caseid);
 	}
@@ -125,8 +134,11 @@ public class MutualExclusion {
 			/** case 1: Receiver is not accessing shared resource and does not want to (send OK to sender) */
 			case 0: {
 				// get a stub for the sender from the registry
+				NodeInterface stub = Util.getProcessStub(procName, port);
 				// acknowledge message
+				message.setAcknowledged(true);
 				// send acknowledgement back by calling onMutexAcknowledgementReceived()
+				stub.onMutexAcknowledgementReceived(message);
 				
 				break;
 			}
@@ -135,6 +147,8 @@ public class MutualExclusion {
 			case 1: {
 				
 				// queue this message
+				queue.add(message);
+
 				break;
 			}
 			
@@ -144,14 +158,30 @@ public class MutualExclusion {
 			 */
 			case 2: {
 				// check the clock of the sending process
+				int clockSender = message.getClock();
 				// own clock for the multicast message
+				int ownClock = node.getMessage().getClock();
 				// compare clocks, the lowest wins
-				// if clocks are the same, compare nodeIDs, the lowest wins
-				// if sender wins, acknowledge the message, obtain a stub and call onMutexAcknowledgementReceived()
-				// if sender looses, queue it
-				
-				
+				NodeInterface stub = Util.getProcessStub(procName, port);
 
+				if(clockSender == ownClock){
+				// if clocks are the same, compare nodeIDs, the lowest wins
+					     if(stub.getNodeID().compareTo(message.getNodeID()) < 0){
+					     	message.setAcknowledged(true);
+					     	stub.onMutexRequestReceived(message);
+						 } else {
+					     	queue.add(message);
+						 }
+
+				} else if(clockSender < ownClock) {
+					// if sender wins, acknowledge the message, obtain a stub and call onMutexAcknowledgementReceived()
+					message.setAcknowledged(true);
+					stub.onMutexRequestReceived(message);
+				} else {
+					// if sender looses, queue it
+					queue.add(message);
+				}
+				
 				break;
 			}
 			
@@ -163,28 +193,31 @@ public class MutualExclusion {
 	public void onMutexAcknowledgementReceived(Message message) throws RemoteException {
 		
 		// add message to queueack
+		queueack.add(message);
 		
 	}
 	
 	// multicast release locks message to other processes including self
-	public void multicastReleaseLocks(Set<Message> activenodes) {
+	public void multicastReleaseLocks(Set<Message> activenodes) throws RemoteException {
 		
 		// iterate over the activenodes
-		
-		// obtain a stub for each node from the registry
-		
-		// call releaseLocks()
-	
+		for (Message msg : activenodes) {
+			// obtain a stub for each node from the registry
+			NodeInterface stub = Util.getProcessStub(msg.getNodeIP(), msg.getPort());
+		   	// call releaseLocks()
+			stub.releaseLocks();
+		}
+
 	}
 	
 	private boolean areAllMessagesReturned(int numvoters) throws RemoteException {
 		// check if the size of the queueack is same as the numvoters
-		
+		   boolean equalSize = queueack.size() == numvoters;
 		// clear the queueack
-		
+		 queueack.clear();
 		// return true if yes and false if no
 
-		return false;
+		return equalSize;
 	}
 	
 	private List<Message> removeDuplicatePeersBeforeVoting() {
